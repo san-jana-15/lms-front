@@ -1,16 +1,111 @@
-# React + Vite
+# LMS – Learning Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full–stack LMS application with:
 
-Currently, two official plugins are available:
+- Student Dashboard  
+- Tutor Dashboard  
+- Admin Dashboard  
+- Session Bookings  
+- Tutor Availability  
+- Recording Purchases  
+- Reviews & Ratings  
+- User Role Management  
+- User Activation / Deactivation  
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🔧 Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Frontend
+- React  
+- Vite  
+- TailwindCSS  
+- Axios  
+- React Router  
 
-## Expanding the ESLint configuration
+## 📁 Project Structure
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+frontend/
+    ├── src/
+    ├── public/
+    ├── vite.config.js
+    └── package.json
+```
+
+
+## 🚀 Frontend Setup
+
+```
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend URL:
+```
+http://localhost:5173
+```
+
+---
+
+## 🔗 API Base URL
+
+```
+http://localhost:5000/api
+```
+
+---
+
+## 📌 Main API Endpoints
+
+### Auth
+- POST /auth/register  
+- POST /auth/login  
+- GET /auth/profile  
+
+### Tutors
+- GET /tutors  
+- GET /tutors/profile/me  
+- PUT /tutors/profile/update  
+
+### Bookings
+- POST /bookings  
+- GET /bookings/student  
+- GET /bookings/tutor  
+- PATCH /bookings/accept/:id  
+- PATCH /bookings/decline/:id  
+- PATCH /bookings/reschedule/:id  
+- PATCH /bookings/tutor-reschedule/:id  
+- PATCH /bookings/cancel/:id  
+
+### Recordings
+- GET /recordings  
+- POST /recordings/upload  
+
+### Payments
+- POST /fake-payment/pay  
+- GET /fake-payment/paid  
+
+### Reviews
+- POST /reviews  
+- GET /reviews/tutor/:id  
+
+### Admin
+- PUT /admin/toggle/:id  
+- PUT /admin/role/:id  
+
+---
+
+1. Start frontend:
+```
+cd frontend
+npm run dev
+```
+
+Your LMS system is now running.
+
+---
+
+## 📄 License
+
+This project is for educational and development use.
