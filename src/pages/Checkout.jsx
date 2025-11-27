@@ -1,4 +1,3 @@
-// pages/Checkout.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -10,22 +9,26 @@ export default function Checkout() {
   const [agree, setAgree] = useState(true);
   const navigate = useNavigate();
 
+  const API = "https://lms-back-nh5h.onrender.com";
+
   useEffect(() => {
-    axios.get("http://localhost:5000/api/tutors")
-      .then(res => {
-        const t = res.data.find(x => x._id === tutorId);
+    axios
+      .get(`${API}/api/tutors`)
+      .then((res) => {
+        const t = res.data.find((x) => x._id === tutorId);
         setTutor(t);
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err));
   }, [tutorId]);
 
-  const loadRazorpay = () => new Promise((resolve) => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
+  const loadRazorpay = () =>
+    new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
 
   const handlePay = async () => {
     if (!email) {
@@ -41,10 +44,14 @@ export default function Checkout() {
 
     try {
       const amount = Number(tutor.price || 0);
-      const { data: order } = await axios.post("http://localhost:5000/api/payments/create-order", { amount });
+
+      const { data: order } = await axios.post(
+        `${API}/api/payments/create-order`,
+        { amount }
+      );
 
       const options = {
-        key: "rzp_test_1234567890", // <-- REPLACE with your key_id
+        key: "rzp_test_1234567890",
         amount: order.amount,
         currency: order.currency || "INR",
         name: "LMS Checkout",
@@ -52,14 +59,13 @@ export default function Checkout() {
         order_id: order.id,
 
         handler: async (response) => {
-          // send verification + save
-          await axios.post("http://localhost:5000/api/payments/verify", {
+          await axios.post(`${API}/api/payments/verify`, {
             tutorId,
             amount,
+            email,
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_order_id: response.razorpay_order_id,
             razorpay_signature: response.razorpay_signature,
-            email,
           });
 
           alert("Payment successful — thank you!");
@@ -80,14 +86,16 @@ export default function Checkout() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left column: checkout flow */}
+        {/* Left column */}
         <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow">
           <h2 className="text-2xl font-bold mb-4">Checkout</h2>
 
           <div className="space-y-6">
             <div>
               <h3 className="font-semibold mb-2">1. Log in or create an account</h3>
-              <p className="text-sm text-gray-600 mb-3">A valid email is required to access your session and receipts.</p>
+              <p className="text-sm text-gray-600 mb-3">
+                A valid email is required to access your session and receipts.
+              </p>
               <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -95,31 +103,52 @@ export default function Checkout() {
                 className="w-full border p-3 rounded mb-3"
               />
 
-              <button onClick={() => alert("Continue (simulate login)")} className="w-40 bg-purple-600 text-white py-2 rounded">Continue</button>
+              <button
+                onClick={() => alert("Continue (simulate login)")}
+                className="w-40 bg-purple-600 text-white py-2 rounded"
+              >
+                Continue
+              </button>
             </div>
 
             <div>
               <h3 className="font-semibold mb-2">2. Billing & payment</h3>
-              <p className="text-sm text-gray-600 mb-3">Your payment is processed securely.</p>
+              <p className="text-sm text-gray-600 mb-3">
+                Your payment is processed securely.
+              </p>
 
               <label className="inline-flex items-center">
-                <input type="checkbox" checked={agree} onChange={() => setAgree(!agree)} className="mr-2" />
+                <input
+                  type="checkbox"
+                  checked={agree}
+                  onChange={() => setAgree(!agree)}
+                  className="mr-2"
+                />
                 I agree to the Terms of Use and Privacy Policy
               </label>
 
               <div className="mt-4">
-                <button onClick={handlePay} className="bg-green-600 text-white px-5 py-3 rounded">Pay Now</button>
+                <button
+                  onClick={handlePay}
+                  className="bg-green-600 text-white px-5 py-3 rounded"
+                >
+                  Pay Now
+                </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right column: order summary */}
+        {/* Right column */}
         <aside className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-lg font-semibold mb-4">Order summary</h3>
 
           <div className="flex items-center gap-4">
-            <img src={tutor.image || "/mnt/data/Screenshot 2025-11-20 190636.png"} alt={tutor.name} className="w-24 h-20 object-cover rounded" />
+            <img
+              src={tutor.image || "/mnt/data/Screenshot 2025-11-20 190636.png"}
+              alt={tutor.name}
+              className="w-24 h-20 object-cover rounded"
+            />
             <div>
               <div className="font-semibold">{tutor.name}</div>
               <div className="text-sm text-gray-500">{tutor.subject}</div>
@@ -131,6 +160,7 @@ export default function Checkout() {
               <span>Original Price:</span>
               <span className="line-through">₹{(tutor.price * 10) || 10000}</span>
             </div>
+
             <div className="flex justify-between py-2">
               <span>Discounts:</span>
               <span>-₹{(tutor.price * 9) || 9000}</span>

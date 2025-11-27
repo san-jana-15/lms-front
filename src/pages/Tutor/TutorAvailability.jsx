@@ -14,10 +14,12 @@ const TutorAvailability = () => {
     loadSlots();
   }, []);
 
+  const API = "https://lms-back-nh5h.onrender.com";
+
   const loadSlots = async () => {
     try {
       const { data } = await axios.get(
-        "http://localhost:5000/api/availability",
+        `${API}/api/availability`,
         { headers }
       );
       setSlots(data);
@@ -31,7 +33,7 @@ const TutorAvailability = () => {
 
     try {
       await axios.post(
-        "http://localhost:5000/api/availability",
+        `${API}/api/availability`,
         { day, startTime: start, endTime: end },
         { headers }
       );
@@ -45,7 +47,7 @@ const TutorAvailability = () => {
   const removeSlot = async (id) => {
     try {
       await axios.delete(
-        `http://localhost:5000/api/availability/${id}`,
+        `${API}/api/availability/${id}`,
         { headers }
       );
       loadSlots();
@@ -53,6 +55,7 @@ const TutorAvailability = () => {
       console.log("DELETE ERROR:", error.response?.data || error);
     }
   };
+
 
   return (
     <div className="p-6 max-w-3xl mx-auto">

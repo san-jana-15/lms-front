@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API = "https://lms-back-nh5h.onrender.com";
+
 const PaymentHistory = ({ userId }) => {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
     const fetchHistory = async () => {
-      const res = await axios.get(`http://localhost:5000/api/auth/profile/${userId}`);
+      const res = await axios.get(`${API}/api/auth/profile/${userId}`);
       setHistory(res.data.paymentHistory || []);
     };
     fetchHistory();

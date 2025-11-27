@@ -8,8 +8,11 @@ export default function TutorDetail() {
   const [tutor, setTutor] = useState(null);
   const navigate = useNavigate();
 
+const API = "https://lms-back-nh5h.onrender.com";
+
+
   useEffect(() => {
-    axios.get("http://localhost:5000/api/tutors")
+    axios.get(`${API}/api/tutors`)
       .then(res => {
         const t = res.data.find(x => x._id === tutorId);
         if (t) setTutor(t);

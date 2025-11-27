@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+const API = "https://lms-back-nh5h.onrender.com";
+
 const BookingModal = ({ tutor, onClose }) => {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
@@ -17,7 +19,7 @@ const BookingModal = ({ tutor, onClose }) => {
       if (!tutorUserId) return setAvailability([]);
       try {
         setLoadingAvail(true);
-        const res = await axios.get(`http://localhost:5000/api/availability/${tutorUserId}`);
+        const res = await axios.get(`${API}/api/availability/${tutorUserId}`);
         setAvailability(res.data || []);
       } catch (err) {
         console.error("Availability fetch error:", err);
@@ -30,7 +32,7 @@ const BookingModal = ({ tutor, onClose }) => {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("token");
-        const profile = await axios.get("http://localhost:5000/api/auth/profile", {
+        const profile = await axios.get(`${API}/api/auth/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUserEmail(profile.data?.email || "");
@@ -97,9 +99,9 @@ const BookingModal = ({ tutor, onClose }) => {
 
       // Save payment (booking payment)
       const pay = await axios.post(
-        "http://localhost:5000/api/fake-payment/pay",
+        `${API}/api/fake-payment/pay`,
         {
-          tutorId: tutor.userId,     // FIXED 100% correct
+          tutorId: tutor.userId,
           amount: tutor.hourlyRate,
           type: "booking",
           recording: null
@@ -111,11 +113,11 @@ const BookingModal = ({ tutor, onClose }) => {
         return alert("Payment failed");
       }
 
-      // Create booking with correct tutorId
+      // Create booking
       await axios.post(
-        "http://localhost:5000/api/bookings",
+        `${API}/api/bookings`,
         {
-          tutorId: tutor.userId,     // FIXED 100% correct
+          tutorId: tutor.userId,
           subject: tutor.subjects?.[0] || "General",
           date: selectedDate,
           time: selectedTime,

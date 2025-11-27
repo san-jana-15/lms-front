@@ -15,9 +15,10 @@ const StudentProfile = () => {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:5000/api/auth/profile",
+        "https://lms-back-nh5h.onrender.com/api/auth/profile",
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
 
       setUser(res.data);
       setName(res.data.name);
@@ -38,15 +39,11 @@ const StudentProfile = () => {
       const token = localStorage.getItem("token");
 
       await axios.put(
-        "http://localhost:5000/api/auth/update-profile",
-        {
-          name,
-          contact,
-          gender,
-          occupation,
-        },
+        "https://lms-back-nh5h.onrender.com/api/auth/update-profile",
+        { name, contact, gender, occupation },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
 
       alert("Profile updated!");
       loadProfile();

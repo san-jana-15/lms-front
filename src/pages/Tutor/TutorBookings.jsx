@@ -10,16 +10,15 @@ const TutorBookings = () => {
 
   const token = localStorage.getItem("token");
   const authHeader = { headers: { Authorization: `Bearer ${token}` } };
+  const API = "https://lms-back-nh5h.onrender.com";
+
 
   /* ===============================
         LOAD TUTOR BOOKINGS
   =============================== */
   const loadBookings = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:5000/api/bookings/tutor",
-        authHeader
-      );
+      const res = await axios.get(`${API}/api/bookings/tutor`, authHeader);
       setBookings(res.data || []);
     } catch (err) {
       console.error("Load tutor bookings error:", err);
@@ -37,11 +36,7 @@ const TutorBookings = () => {
   =============================== */
   const handleAccept = async (id) => {
     try {
-      await axios.patch(
-        `http://localhost:5000/api/bookings/accept/${id}`,
-        {},
-        authHeader
-      );
+      await axios.patch(`${API}/api/bookings/accept/${id}`, {}, authHeader);
       loadBookings();
     } catch (err) {
       console.error("Accept error:", err);
@@ -54,11 +49,7 @@ const TutorBookings = () => {
   =============================== */
   const handleDecline = async (id) => {
     try {
-      await axios.patch(
-        `http://localhost:5000/api/bookings/decline/${id}`,
-        {},
-        authHeader
-      );
+      await axios.patch(`${API}/api/bookings/decline/${id}`, {}, authHeader);
       loadBookings();
     } catch (err) {
       console.error("Decline error:", err);
@@ -118,8 +109,8 @@ const TutorBookings = () => {
                     b.tutorStatus === "accepted"
                       ? "text-green-600"
                       : b.tutorStatus === "declined"
-                      ? "text-red-600"
-                      : "text-yellow-600"
+                        ? "text-red-600"
+                        : "text-yellow-600"
                   }
                 >
                   {b.tutorStatus}

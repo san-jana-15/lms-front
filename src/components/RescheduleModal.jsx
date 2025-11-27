@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+const API = "https://lms-back-nh5h.onrender.com";
+
 const RescheduleModal = ({ booking, onClose }) => {
   const [newDate, setNewDate] = useState("");
   const [newTime, setNewTime] = useState("");
@@ -15,7 +17,7 @@ const RescheduleModal = ({ booking, onClose }) => {
 
     try {
       await axios.patch(
-        `http://localhost:5000/api/bookings/reschedule/${booking._id}`,
+        `${API}/api/bookings/reschedule/${booking._id}`,
         {
           date: newDate,
           time: newTime,

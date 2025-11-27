@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const BACKEND = "http://localhost:5000";
+const BACKEND = "https://lms-back-nh5h.onrender.com";
+
 
 export default function TutorSetupPage() {
   const [headline, setHeadline] = useState("");

@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import api from "../../axiosClient";
 import { FiPlay, FiTrash2, FiUpload } from "react-icons/fi";
 
+const API = "https://lms-back-nh5h.onrender.com";
+
 const TutorRecordings = () => {
   const [recordings, setRecordings] = useState([]);
 
   const [file, setFile] = useState(null);
   const [description, setDescription] = useState("");
-  const [subject, setSubject] = useState("");       // NEW
-  const [price, setPrice] = useState("");           // NEW
+  const [subject, setSubject] = useState("");       
+  const [price, setPrice] = useState("");           
 
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -38,8 +40,8 @@ const TutorRecordings = () => {
       const fd = new FormData();
       fd.append("recording", file);
       fd.append("description", description);
-      fd.append("subject", subject);    // NEW
-      fd.append("price", price);        // NEW
+      fd.append("subject", subject);    
+      fd.append("price", price);        
 
       await api.post("/recordings/upload", fd, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -48,8 +50,8 @@ const TutorRecordings = () => {
       alert("Uploaded successfully");
       setFile(null);
       setDescription("");
-      setSubject("");     // CLEAR
-      setPrice("");       // CLEAR
+      setSubject("");     
+      setPrice("");       
 
       fetchRecordings();
     } catch (err) {
@@ -100,7 +102,7 @@ const TutorRecordings = () => {
             className="border p-3 rounded-lg shadow-sm"
           />
 
-          {/* Subject (NEW) */}
+          {/* Subject */}
           <input
             type="text"
             value={subject}
@@ -109,7 +111,7 @@ const TutorRecordings = () => {
             className="border p-3 rounded-lg shadow-sm"
           />
 
-          {/* Price (NEW) */}
+          {/* Price */}
           <input
             type="number"
             value={price}
@@ -138,12 +140,12 @@ const TutorRecordings = () => {
             {/* Video Thumbnail */}
             <div className="relative">
               <video
-                src={`http://localhost:5000${r.filePath}`}
+                src={`${API}${r.filePath}`}
                 className="w-full h-40 object-cover opacity-90 group-hover:opacity-100 transition"
               ></video>
 
               <button
-                onClick={() => setSelectedVideo(`http://localhost:5000${r.filePath}`)}
+                onClick={() => setSelectedVideo(`${API}${r.filePath}`)}
                 className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-50 transition"
               >
                 <FiPlay className="text-white text-4xl" />
@@ -154,15 +156,12 @@ const TutorRecordings = () => {
             <div className="p-4">
               <h4 className="text-lg font-semibold">{r.originalFileName}</h4>
 
-              {/* Description */}
               <p className="text-gray-600 text-sm">{r.description || "No description"}</p>
 
-              {/* Subject */}
               <p className="text-sm text-gray-700 mt-1">
                 <strong>Subject:</strong> {r.subject || "—"}
               </p>
 
-              {/* Price */}
               <p className="text-sm text-green-700 font-bold mt-1">
                 Price: ₹{r.price || 0}
               </p>

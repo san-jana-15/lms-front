@@ -10,9 +10,11 @@ const StudentPayments = () => {
   const loadPayments = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/payments/student", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(
+        "https://lms-back-nh5h.onrender.com/api/payments/student",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
       setPayments(res.data || []);
     } catch (err) {
       console.error("Error loading payments", err);

@@ -1,5 +1,3 @@
-// src/pages/Tutor/TutorDashboard.jsx
-
 import React, { useEffect, useState } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import axios from "axios";
@@ -11,6 +9,8 @@ import {
   FiStar,
   FiUser,
 } from "react-icons/fi";
+
+const API = "https://lms-back-nh5h.onrender.com";
 
 const TutorDashboard = () => {
   const navigate = useNavigate();
@@ -36,10 +36,7 @@ const TutorDashboard = () => {
   =============================== */
   const loadTutor = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:5000/api/auth/profile",
-        authHeader
-      );
+      const res = await axios.get(`${API}/api/auth/profile`, authHeader);
       setTutor(res.data);
     } catch (err) {
       console.error("Tutor profile load error:", err);
@@ -51,10 +48,7 @@ const TutorDashboard = () => {
   =============================== */
   const loadTutorProfile = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:5000/api/tutors/profile/me",
-        authHeader
-      );
+      const res = await axios.get(`${API}/api/tutors/profile/me`, authHeader);
 
       setProfile(res.data);
 
@@ -74,9 +68,9 @@ const TutorDashboard = () => {
       setLoading(true);
 
       const [b, p, r] = await Promise.all([
-        axios.get("http://localhost:5000/api/bookings/tutor", authHeader),
-        axios.get("http://localhost:5000/api/payments/tutor", authHeader),
-        axios.get("http://localhost:5000/api/recordings/tutor", authHeader),
+        axios.get(`${API}/api/bookings/tutor`, authHeader),
+        axios.get(`${API}/api/payments/tutor`, authHeader),
+        axios.get(`${API}/api/recordings/tutor`, authHeader),
       ]);
 
       setBookings(b.data || []);
@@ -104,7 +98,7 @@ const TutorDashboard = () => {
       }
 
       const res = await axios.get(
-        `http://localhost:5000/api/reviews/tutor/${tutorUserId}`
+        `${API}/api/reviews/tutor/${tutorUserId}`
       );
 
       setReviews(res.data?.reviews || []);
@@ -126,14 +120,12 @@ const TutorDashboard = () => {
 
   useEffect(() => {
     if (profile || tutor) loadReviews();
-    // eslint-disable-next-line
   }, [profile, tutor]);
 
   return (
     <div className="flex h-screen bg-gray-50 text-gray-800">
-      {/* ==========================
-            PROFILE SETUP POPUP
-      =========================== */}
+
+      {/* SETUP POPUP */}
       {showSetup && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-xl w-96 shadow-lg">
@@ -155,9 +147,7 @@ const TutorDashboard = () => {
         </div>
       )}
 
-      {/* ==========================
-              SIDEBAR
-      =========================== */}
+      {/* SIDEBAR */}
       <aside className="w-64 bg-white shadow-xl border-r flex flex-col">
         <div className="p-6 border-b flex items-center justify-between">
           <h1 className="text-2xl font-bold text-blue-600">Tutor Panel</h1>
@@ -174,64 +164,40 @@ const TutorDashboard = () => {
         </div>
 
         <nav className="flex-1 p-4 space-y-2">
-          <button
-            onClick={() => navigate("/dashboard/tutor")}
-            className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-gray-100 transition font-medium"
-          >
+          <button onClick={() => navigate("/dashboard/tutor")} className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-gray-100">
             <FiUser /> Overview
           </button>
 
-          <button
-            onClick={() => navigate("/dashboard/tutor/availability")}
-            className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-gray-100 transition font-medium"
-          >
+          <button onClick={() => navigate("/dashboard/tutor/availability")} className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-gray-100">
             <FiClock /> Availability
           </button>
 
-          <button
-            onClick={() => navigate("/dashboard/tutor/bookings")}
-            className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-gray-100 transition font-medium"
-          >
+          <button onClick={() => navigate("/dashboard/tutor/bookings")} className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-gray-100">
             <FiClock /> Bookings
           </button>
 
-          <button
-            onClick={() => navigate("/dashboard/tutor/payments")}
-            className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-gray-100 transition font-medium"
-          >
+          <button onClick={() => navigate("/dashboard/tutor/payments")} className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-gray-100">
             <FiCreditCard /> Payments
           </button>
 
-          <button
-            onClick={() => navigate("/dashboard/tutor/recordings")}
-            className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-gray-100 transition font-medium"
-          >
+          <button onClick={() => navigate("/dashboard/tutor/recordings")} className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-gray-100">
             <FiVideo /> Recordings
           </button>
 
-          <button
-            onClick={() => navigate("/dashboard/tutor/reviews")}
-            className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-gray-100 transition font-medium"
-          >
+          <button onClick={() => navigate("/dashboard/tutor/reviews")} className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-gray-100">
             <FiStar /> Reviews
           </button>
 
-          <button
-            onClick={() => navigate("/dashboard/tutor/setup")}
-            className="flex items-center gap-3 w-full p-3 rounded-lg transition text-gray-700 hover:bg-purple-100"
-          >
+          <button onClick={() => navigate("/dashboard/tutor/setup")} className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-purple-100">
             📝 Profile Setup
           </button>
         </nav>
       </aside>
 
-      {/* ==========================
-                MAIN
-      =========================== */}
+      {/* MAIN */}
       <main className="flex-1 p-10 overflow-y-auto">
         <h2 className="text-3xl font-extrabold mb-8">
-          Welcome,{" "}
-          <span className="text-blue-600">{tutor?.name || "Tutor"}</span>
+          Welcome, <span className="text-blue-600">{tutor?.name || "Tutor"}</span>
         </h2>
 
         {/* STATS */}
@@ -256,9 +222,7 @@ const TutorDashboard = () => {
           </div>
         </div>
 
-        {/* ==========================
-               REVIEWS
-        =========================== */}
+        {/* REVIEWS */}
         <section className="bg-white p-6 rounded-lg shadow mb-6">
           <h3 className="text-lg font-semibold mb-4">Reviews</h3>
 
@@ -272,9 +236,7 @@ const TutorDashboard = () => {
                 <div key={r._id} className="border p-3 rounded">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-medium">
-                        {r.student?.name || "Student"}
-                      </div>
+                      <div className="font-medium">{r.student?.name || "Student"}</div>
                       <div className="text-xs text-gray-500">
                         {new Date(r.createdAt).toLocaleString()}
                       </div>

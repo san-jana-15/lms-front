@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+const API = "https://lms-back-nh5h.onrender.com";
+
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
@@ -13,7 +15,7 @@ const AdminDashboard = () => {
   const loadUsers = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/admin/users", {
+      const res = await axios.get(`${API}/api/admin/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(res.data || []);
@@ -26,7 +28,7 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/admin/toggle/${id}`,
+        `${API}/api/admin/toggle/${id}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -45,7 +47,7 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/admin/role/${id}`,
+        `${API}/api/admin/role/${id}`,
         { role },
         { headers: { Authorization: `Bearer ${token}` } }
       );

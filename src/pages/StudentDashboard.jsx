@@ -29,9 +29,11 @@ const StudentDashboard = () => {
   const loadProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/auth/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(
+        "https://lms-back-nh5h.onrender.com/api/auth/profile",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
       setUser(res.data);
     } catch (err) {
       console.error("Profile load error:", err);
@@ -40,7 +42,8 @@ const StudentDashboard = () => {
 
   const loadTutors = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/tutors");
+      const res = await axios.get("https://lms-back-nh5h.onrender.com/api/tutors");
+
       setTutors(res.data || []);
     } catch (err) {
       console.error("Tutors load error:", err);
@@ -50,9 +53,11 @@ const StudentDashboard = () => {
   const loadPurchasedRecordings = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/payments/student", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(
+        "https://lms-back-nh5h.onrender.com/api/payments/student",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
       const purchasedIds = (res.data || [])
         .map((p) => (p.recording ? String(p.recording?._id || p.recording) : null))
         .filter(Boolean);
@@ -70,8 +75,9 @@ const StudentDashboard = () => {
     const tutorUserId = tutor.userId;
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/recordings?tutorId=${tutorUserId}`
+        `https://lms-back-nh5h.onrender.com/api/recordings?tutorId=${tutorUserId}`
       );
+
       setRecordings(res.data || []);
     } catch (err) {
       console.error("Error loading tutor recordings:", err);
@@ -81,8 +87,8 @@ const StudentDashboard = () => {
 
   const tutorRecordings = selectedTutor
     ? recordings.filter(
-        rec => String(rec.tutor?._id || rec.tutor) === String(selectedTutor.userId)
-      )
+      rec => String(rec.tutor?._id || rec.tutor) === String(selectedTutor.userId)
+    )
     : [];
 
   const handlePaid = (recId) =>

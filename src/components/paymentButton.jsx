@@ -1,6 +1,8 @@
 import React from "react";
 import axios from "axios";
 
+const API = "https://lms-back-nh5h.onrender.com";
+
 const PaymentButton = ({ recordingId, amount, tutorId, onPaid }) => {
 
   const handlePayment = async () => {
@@ -10,7 +12,7 @@ const PaymentButton = ({ recordingId, amount, tutorId, onPaid }) => {
       const token = localStorage.getItem("token");
 
       // Get student email
-      const profile = await axios.get("http://localhost:5000/api/auth/profile", {
+      const profile = await axios.get(`${API}/api/auth/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -18,7 +20,7 @@ const PaymentButton = ({ recordingId, amount, tutorId, onPaid }) => {
 
       // Save payment in backend
       const res = await axios.post(
-        "http://localhost:5000/api/payments/verify",
+        `${API}/api/payments/verify`,
         {
           tutorId,
           amount,
@@ -32,10 +34,9 @@ const PaymentButton = ({ recordingId, amount, tutorId, onPaid }) => {
 
       console.log("VERIFY RESPONSE:", res.data);
 
-      // 🔥 FIX: backend does NOT return success:true
       if (res.status === 200) {
         alert("Payment successful!");
-        onPaid(recordingId);  // instantly update UI
+        onPaid(recordingId); 
         return;
       }
 

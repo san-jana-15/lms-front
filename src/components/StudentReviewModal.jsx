@@ -2,17 +2,20 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+const API = "https://lms-back-nh5h.onrender.com";
+
 const StudentReviewModal = ({ recordingId, tutorId, onClose, onSaved }) => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
 
   const submitReview = async () => {
     if (!rating || !comment) return alert("Please add comment and rating");
+
     try {
       const token = localStorage.getItem("token");
 
       await axios.post(
-        "http://localhost:5000/api/reviews",
+        `${API}/api/reviews`,
         {
           tutorId,
           rating,

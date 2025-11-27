@@ -1,4 +1,3 @@
-// src/pages/StudentRecordings.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import StudentSidebar from "../components/StudentSidebar";
@@ -16,13 +15,15 @@ const StudentRecordings = () => {
   const [reviewRecordingId, setReviewRecordingId] = useState(null);
   const [reviewTutorId, setReviewTutorId] = useState(null);
 
+  const API = "https://lms-back-nh5h.onrender.com";
+
   const loadRecordings = async () => {
     try {
       const token = localStorage.getItem("token");
 
       const [recRes, payRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/recordings"),
-        axios.get("http://localhost:5000/api/payments/student", {
+        axios.get(`${API}/api/recordings`),
+        axios.get(`${API}/api/payments/student`, {
           headers: { Authorization: `Bearer ${token}` },
         })
       ]);
@@ -45,27 +46,20 @@ const StudentRecordings = () => {
     loadRecordings();
   }, []);
 
-  // PLAY RECORDING (with review check)
   const handlePlay = async (rec) => {
-    // check purchased client-side (we already fetched student's payments)
     if (!paidIds.has(rec._id)) {
       alert("You must purchase this recording to watch it.");
       return;
     }
 
-    // Show the video directly; the review check will be prompted at 'ended' event
-    const url = `http://localhost:5000/${rec.filePath.replace(/\\/g, "/")}`;
+    const url = `${API}/${rec.filePath.replace(/\\/g, "/")}`;
     setSelectedVideoUrl(url);
   };
 
-  // When video ends, show review modal if not reviewed before for this student/recording.
-  // We'll track per-recording first-time-review in localStorage to avoid repeated prompts.
   const handleVideoEnded = (rec) => {
     const key = `reviewed_${rec._id}`;
-    if (localStorage.getItem(key)) {
-      return; // already reviewed before on this browser
-    }
-    // open modal to submit review first time
+    if (localStorage.getItem(key)) return;
+
     setReviewRecordingId(rec._id);
     setReviewTutorId(rec.tutor?._id);
     setShowReviewModal(true);
@@ -93,7 +87,7 @@ const StudentRecordings = () => {
             {purchased.map((rec) => (
               <div key={rec._id} className="bg-white shadow rounded-xl p-5">
                 <video
-                  src={`http://localhost:5000/${rec.filePath.replace(/\\/g, "/")}`}
+                  src={`${API}/${rec.filePath.replace(/\\/g, "/")}`}
                   onClick={() => handlePlay(rec)}
                   className="w-full h-40 rounded-lg mb-3 cursor-pointer"
                   controls={false}
@@ -115,7 +109,6 @@ const StudentRecordings = () => {
 
                   <button
                     onClick={() => {
-                      // allow student to rate tutor manually here as well
                       setReviewRecordingId(rec._id);
                       setReviewTutorId(rec.tutor?._id);
                       setShowReviewModal(true);
@@ -139,7 +132,6 @@ const StudentRecordings = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {available.map((rec) => (
               <div key={rec._id} className="bg-white shadow rounded-xl p-5">
-
                 <div className="relative w-full h-40 bg-black rounded-lg overflow-hidden mb-3" />
 
                 <h3 className="text-lg font-semibold">{rec.originalFileName}</h3>
@@ -177,23 +169,16 @@ const StudentRecordings = () => {
               ✖
             </button>
 
-            {/* video element with onEnded -> show review modal */}
             <video
               controls
               autoPlay
               src={selectedVideoUrl}
               className="w-full rounded-lg"
               onEnded={() => {
-                // find recording object from URL
-                const rec = recordings.find(r => selectedVideoUrl.includes(r._id) || selectedVideoUrl.includes(r.originalFileName));
-                // fallback: use last played
-                if (rec) {
-                  handleVideoEnded(rec);
-                } else {
-                  // if cannot find rec by URL, find by filePath
-                  const rec2 = recordings.find(r => selectedVideoUrl.endsWith(r.filePath.replace(/\\/g, "/")));
-                  if (rec2) handleVideoEnded(rec2);
-                }
+                const rec = recordings.find(r =>
+                  selectedVideoUrl.includes(r.originalFileName)
+                );
+                if (rec) handleVideoEnded(rec);
               }}
             />
           </div>
@@ -207,7 +192,6 @@ const StudentRecordings = () => {
           tutorId={reviewTutorId}
           onClose={() => setShowReviewModal(false)}
           onSaved={() => {
-            // mark as reviewed locally so we only ask once
             if (reviewRecordingId) {
               localStorage.setItem(`reviewed_${reviewRecordingId}`, "1");
             }

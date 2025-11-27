@@ -14,7 +14,7 @@ const StudentBookings = () => {
   const loadBookings = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/bookings/student",
+        "https://lms-back-nh5h.onrender.com/api/bookings/student",
         authHeader
       );
       setBookings(res.data || []);
@@ -30,10 +30,11 @@ const StudentBookings = () => {
 
     try {
       await axios.patch(
-        `http://localhost:5000/api/bookings/cancel/${id}`,
+        `https://lms-back-nh5h.onrender.com/api/bookings/cancel/${id}`,
         {},
         authHeader
       );
+
       loadBookings();
     } catch (err) {
       console.error("Cancel error:", err);
@@ -88,8 +89,8 @@ const StudentBookings = () => {
                   b.tutorStatus === "accepted"
                     ? "text-green-600"
                     : b.tutorStatus === "declined"
-                    ? "text-red-600"
-                    : "text-yellow-600"
+                      ? "text-red-600"
+                      : "text-yellow-600"
                 }
               >
                 {b.tutorStatus}

@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+const API = "https://lms-back-nh5h.onrender.com";
+
 const ReviewForm = ({ tutorId, recordingOptions = [], onSaved }) => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
@@ -11,17 +13,26 @@ const ReviewForm = ({ tutorId, recordingOptions = [], onSaved }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!rating || !comment) return alert("Please provide rating and comment");
+
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
+
       const res = await axios.post(
-        "http://localhost:5000/api/reviews",
-        { tutorId, rating, comment, recordingId: recordingId || null },
+        `${API}/api/reviews`,
+        {
+          tutorId,
+          rating,
+          comment,
+          recordingId: recordingId || null
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       setComment("");
       setRating(5);
       setRecordingId("");
+
       if (onSaved) onSaved(res.data);
     } catch (err) {
       console.error("Review submit error:", err);

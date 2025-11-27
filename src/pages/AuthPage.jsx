@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const API = "https://lms-back-nh5h.onrender.com";
+
 const AuthPage = () => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
@@ -9,42 +11,34 @@ const AuthPage = () => {
     name: "",
     email: "",
     password: "",
-    role: "student", // student | tutor | admin
+    role: "student",
   });
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const toggleForm = () => {
-    setIsLogin(!isLogin);
-  };
+  const toggleForm = () => setIsLogin(!isLogin);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       if (isLogin) {
-        // ✅ LOGIN
-        const res = await axios.post("http://localhost:5000/api/auth/login", form, {
+        const res = await axios.post(`${API}/api/auth/login`, form, {
           withCredentials: true,
         });
-        console.log("✅ Login successful:", res.data);
 
-        // Save user + token
         localStorage.setItem("user", JSON.stringify(res.data.user));
         localStorage.setItem("token", res.data.token);
 
         navigate(`/dashboard/${res.data.user.role}`);
       } else {
-        // ✅ REGISTER
-        const res = await axios.post("http://localhost:5000/api/auth/register", form);
-        console.log("✅ Registered successfully:", res.data);
-        alert("Registration successful! You can now login.");
+        const res = await axios.post(`${API}/api/auth/register`, form);
+        alert("Registration successful!");
         setIsLogin(true);
       }
     } catch (err) {
-      console.error("❌ Auth failed:", err.response?.data || err.message);
       alert(err.response?.data?.message || "Something went wrong.");
     }
   };
@@ -53,7 +47,6 @@ const AuthPage = () => {
     <div style={styles.container}>
       <div style={styles.card}>
         <h2 style={styles.title}>{isLogin ? "Login" : "Register"}</h2>
-
         <form onSubmit={handleSubmit} style={styles.form}>
           {!isLogin && (
             <>
@@ -68,12 +61,7 @@ const AuthPage = () => {
               />
 
               <label style={styles.label}>Role</label>
-              <select
-                name="role"
-                value={form.role}
-                onChange={handleChange}
-                style={styles.input}
-              >
+              <select name="role" value={form.role} onChange={handleChange} style={styles.input}>
                 <option value="student">Student</option>
                 <option value="tutor">Tutor</option>
                 <option value="admin">Admin</option>
@@ -82,24 +70,10 @@ const AuthPage = () => {
           )}
 
           <label style={styles.label}>Email</label>
-          <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            style={styles.input}
-            required
-          />
+          <input type="email" name="email" value={form.email} onChange={handleChange} style={styles.input} required />
 
           <label style={styles.label}>Password</label>
-          <input
-            type="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            style={styles.input}
-            required
-          />
+          <input type="password" name="password" value={form.password} onChange={handleChange} style={styles.input} required />
 
           <button type="submit" style={styles.button}>
             {isLogin ? "Login" : "Register"}
@@ -107,15 +81,15 @@ const AuthPage = () => {
         </form>
 
         <p style={styles.toggleText}>
-          {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+          {isLogin ? "Don't have an account?" : "Already have an account?"}
           <span style={styles.toggleLink} onClick={toggleForm}>
-            {isLogin ? "Register here" : "Login here"}
+            {isLogin ? " Register" : " Login"}
           </span>
         </p>
       </div>
     </div>
   );
-};
+}
 
 // --- Basic inline styles (no Tailwind) ---
 const styles = {

@@ -7,6 +7,9 @@ const TutorPayments = () => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const API = "https://lms-back-nh5h.onrender.com";
+
+
   useEffect(() => {
     loadPayments();
   }, []);
@@ -14,9 +17,10 @@ const TutorPayments = () => {
   const loadPayments = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/payments/tutor", {
+      const res = await axios.get(`${API}/api/payments/tutor`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       // If server returns tutor payments without population, consider populating in backend.
       setPayments(res.data || []);
     } catch (err) {
