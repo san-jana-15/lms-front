@@ -1,0 +1,79 @@
+// src/components/RescheduleModal.jsx
+import React, { useState } from "react";
+import axios from "axios";
+
+const RescheduleModal = ({ booking, onClose }) => {
+  const [newDate, setNewDate] = useState("");
+  const [newTime, setNewTime] = useState("");
+
+  const token = localStorage.getItem("token");
+
+  const handleStudentReschedule = async () => {
+    if (!newDate || !newTime) {
+      return alert("Please select date and time");
+    }
+
+    try {
+      await axios.patch(
+        `http://localhost:5000/api/bookings/reschedule/${booking._id}`,
+        {
+          date: newDate,
+          time: newTime,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert("Booking rescheduled");
+      onClose();
+    } catch (err) {
+      console.error("Student reschedule failed:", err);
+      alert("Failed to reschedule");
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
+      <div className="bg-white p-6 rounded-xl shadow-lg w-96">
+        <h2 className="text-xl font-bold text-purple-600 mb-4">
+          Reschedule Booking
+        </h2>
+
+        <label className="block mb-3">
+          <span className="text-sm font-medium">New Date</span>
+          <input
+            type="date"
+            className="w-full p-2 border rounded mt-1"
+            value={newDate}
+            onChange={(e) => setNewDate(e.target.value)}
+          />
+        </label>
+
+        <label className="block mb-3">
+          <span className="text-sm font-medium">New Time</span>
+          <input
+            type="time"
+            className="w-full p-2 border rounded mt-1"
+            value={newTime}
+            onChange={(e) => setNewTime(e.target.value)}
+          />
+        </label>
+
+        <button
+          onClick={handleStudentReschedule}
+          className="w-full bg-purple-600 text-white py-2 rounded mt-4"
+        >
+          Save Changes
+        </button>
+
+        <button
+          onClick={onClose}
+          className="w-full bg-gray-300 py-2 rounded mt-3"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default RescheduleModal;
