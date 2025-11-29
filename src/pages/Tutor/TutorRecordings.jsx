@@ -6,12 +6,10 @@ const API = "https://lms-back-nh5h.onrender.com";
 
 const TutorRecordings = () => {
   const [recordings, setRecordings] = useState([]);
-
   const [file, setFile] = useState(null);
   const [description, setDescription] = useState("");
-  const [subject, setSubject] = useState("");       
-  const [price, setPrice] = useState("");           
-
+  const [subject, setSubject] = useState("");
+  const [price, setPrice] = useState("");
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [uploading, setUploading] = useState(false);
 
@@ -40,21 +38,21 @@ const TutorRecordings = () => {
       const fd = new FormData();
       fd.append("recording", file);
       fd.append("description", description);
-      fd.append("subject", subject);    
-      fd.append("price", price);        
+      fd.append("subject", subject);
+      fd.append("price", price);
 
-      await api.post("/recordings/upload", fd, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      // ❗ DO NOT manually set Content-Type (breaks uploads)
+      await api.post("/recordings/upload", fd);
 
       alert("Uploaded successfully");
       setFile(null);
       setDescription("");
-      setSubject("");     
-      setPrice("");       
+      setSubject("");
+      setPrice("");
 
       fetchRecordings();
     } catch (err) {
+      console.error(err);
       alert("Upload failed");
     } finally {
       setUploading(false);
@@ -75,7 +73,9 @@ const TutorRecordings = () => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <h2 className="text-4xl font-bold mb-8 text-gray-800">🎥 Lesson Recordings</h2>
+      <h2 className="text-4xl font-bold mb-8 text-gray-800">
+        🎥 Lesson Recordings
+      </h2>
 
       {/* Upload Section */}
       <div className="bg-white p-6 mb-8 rounded-2xl shadow-lg border">
@@ -84,8 +84,6 @@ const TutorRecordings = () => {
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-          {/* File */}
           <input
             type="file"
             accept="video/*"
@@ -93,7 +91,6 @@ const TutorRecordings = () => {
             className="border p-3 rounded-lg shadow-sm"
           />
 
-          {/* Description */}
           <input
             type="text"
             value={description}
@@ -102,7 +99,6 @@ const TutorRecordings = () => {
             className="border p-3 rounded-lg shadow-sm"
           />
 
-          {/* Subject */}
           <input
             type="text"
             value={subject}
@@ -111,7 +107,6 @@ const TutorRecordings = () => {
             className="border p-3 rounded-lg shadow-sm"
           />
 
-          {/* Price */}
           <input
             type="number"
             value={price}
@@ -137,7 +132,6 @@ const TutorRecordings = () => {
             key={r._id}
             className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 border group"
           >
-            {/* Video Thumbnail */}
             <div className="relative">
               <video
                 src={`${API}${r.filePath}`}
@@ -152,11 +146,11 @@ const TutorRecordings = () => {
               </button>
             </div>
 
-            {/* Info Section */}
             <div className="p-4">
               <h4 className="text-lg font-semibold">{r.originalFileName}</h4>
-
-              <p className="text-gray-600 text-sm">{r.description || "No description"}</p>
+              <p className="text-gray-600 text-sm">
+                {r.description || "No description"}
+              </p>
 
               <p className="text-sm text-gray-700 mt-1">
                 <strong>Subject:</strong> {r.subject || "—"}
@@ -188,7 +182,6 @@ const TutorRecordings = () => {
             <button
               onClick={() => setSelectedVideo(null)}
               className="absolute -top-3 -right-3 bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg hover:bg-red-700 transition"
-              style={{ zIndex: 10000 }}
             >
               ✖
             </button>

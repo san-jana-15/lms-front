@@ -1,11 +1,12 @@
 import axios from "axios";
 
-const axiosClient = axios.create({
+const api = axios.create({
   baseURL: "https://lms-back-nh5h.onrender.com/api",
-  withCredentials: true,
+  withCredentials: false, // you are using JWT, not cookies
 });
 
-axiosClient.interceptors.request.use((config) => {
+// Automatically attach Authorization header
+api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -13,4 +14,4 @@ axiosClient.interceptors.request.use((config) => {
   return config;
 });
 
-export default axiosClient;
+export default api;

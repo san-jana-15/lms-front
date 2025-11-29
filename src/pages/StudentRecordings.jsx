@@ -8,15 +8,15 @@ const StudentRecordings = () => {
   const [recordings, setRecordings] = useState([]);
   const [paidIds, setPaidIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
-  const [selectedVideoUrl, setSelectedVideoUrl] = useState(null);
+  const [selectedVideo, setSelectedVideo] = useState(null); // { url, id }
 
-  // REVIEW MODAL
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [reviewRecordingId, setReviewRecordingId] = useState(null);
   const [reviewTutorId, setReviewTutorId] = useState(null);
 
   const API = "https://lms-back-nh5h.onrender.com";
 
+  // Load purchased recordings + available recordings
   const loadRecordings = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -46,16 +46,32 @@ const StudentRecordings = () => {
     loadRecordings();
   }, []);
 
+  // SECURE Playback URL
   const handlePlay = async (rec) => {
     if (!paidIds.has(rec._id)) {
       alert("You must purchase this recording to watch it.");
       return;
     }
 
-    const url = `${API}/${rec.filePath.replace(/\\/g, "/")}`;
-    setSelectedVideoUrl(url);
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await axios.get(`${API}/api/recordings/${rec._id}/url`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setSelectedVideo({
+        url: `${API}${res.data.url}`,
+        id: rec._id,
+      });
+
+    } catch (err) {
+      console.error("Playback URL error:", err);
+      alert("Unable to load video. Try again.");
+    }
   };
 
+  // Show review modal after video ends
   const handleVideoEnded = (rec) => {
     const key = `reviewed_${rec._id}`;
     if (localStorage.getItem(key)) return;
@@ -87,7 +103,7 @@ const StudentRecordings = () => {
             {purchased.map((rec) => (
               <div key={rec._id} className="bg-white shadow rounded-xl p-5">
                 <video
-                  src={`${API}/${rec.filePath.replace(/\\/g, "/")}`}
+                  src={`${API}${rec.filePath}`}
                   onClick={() => handlePlay(rec)}
                   className="w-full h-40 rounded-lg mb-3 cursor-pointer"
                   controls={false}
@@ -159,12 +175,12 @@ const StudentRecordings = () => {
       </div>
 
       {/* VIDEO PLAYER MODAL */}
-      {selectedVideoUrl && (
+      {selectedVideo && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-4 max-w-3xl w-full relative">
             <button
               className="absolute top-2 right-2 text-xl"
-              onClick={() => setSelectedVideoUrl(null)}
+              onClick={() => setSelectedVideo(null)}
             >
               ✖
             </button>
@@ -172,12 +188,10 @@ const StudentRecordings = () => {
             <video
               controls
               autoPlay
-              src={selectedVideoUrl}
+              src={selectedVideo.url}
               className="w-full rounded-lg"
               onEnded={() => {
-                const rec = recordings.find(r =>
-                  selectedVideoUrl.includes(r.originalFileName)
-                );
+                const rec = recordings.find(r => r._id === selectedVideo.id);
                 if (rec) handleVideoEnded(rec);
               }}
             />
