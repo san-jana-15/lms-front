@@ -14,11 +14,9 @@ const StudentPayments = () => {
         "https://lms-back-nh5h.onrender.com/api/payments/student",
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
       setPayments(res.data || []);
-    } catch (err) {
-      console.error("Error loading payments", err);
-    } finally {
+    } catch {}
+    finally {
       setLoading(false);
     }
   };
@@ -28,36 +26,46 @@ const StudentPayments = () => {
   }, []);
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gradient-to-br from-purple-50 to-blue-50 font-jakarta">
       <StudentSidebar />
 
-      <div className="flex-1 p-8 overflow-y-auto">
-        <h1 className="text-3xl font-bold mb-6">My Payments</h1>
+      <div className="flex-1 p-10 overflow-y-auto">
+
+        <h1 className="text-4xl font-extrabold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
+          My Payments
+        </h1>
 
         {loading ? (
-          <p>Loading...</p>
+          <p className="text-lg text-gray-600">Loading...</p>
         ) : payments.length === 0 ? (
           <p className="text-gray-600">You haven't made any payments yet.</p>
         ) : (
-          <div className="bg-white rounded-xl shadow p-6">
-            <table className="w-full">
+          <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100">
+            <table className="w-full text-left">
               <thead>
-                <tr className="border-b text-left text-gray-700">
-                  <th className="py-3">Type / Recording</th>
-                  <th>Amount</th>
-                  <th>Tutor</th>
-                  <th>Date</th>
+                <tr className="border-b text-gray-700">
+                  <th className="py-3 font-semibold">Type / Recording</th>
+                  <th className="font-semibold">Amount</th>
+                  <th className="font-semibold">Tutor</th>
+                  <th className="font-semibold">Date</th>
                 </tr>
               </thead>
 
               <tbody>
                 {payments.map((p) => (
-                  <tr key={p._id} className="border-b">
+                  <tr key={p._id} className="border-b hover:bg-purple-50/40 transition">
                     <td className="py-3">
-                      {p.recording ? p.recording.originalFileName : "Booking Payment"}
+                      {p.recording
+                        ? p.recording.originalFileName
+                        : "Booking Payment"}
                     </td>
-                    <td className="font-semibold text-green-600">₹{p.amount}</td>
+
+                    <td className="font-semibold text-green-600">
+                      ₹{p.amount}
+                    </td>
+
                     <td>{p.tutor?.name || p.tutor || "Tutor"}</td>
+
                     <td>{new Date(p.createdAt || p.date).toLocaleString()}</td>
                   </tr>
                 ))}
@@ -65,6 +73,7 @@ const StudentPayments = () => {
             </table>
           </div>
         )}
+
       </div>
     </div>
   );

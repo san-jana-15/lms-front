@@ -16,6 +16,7 @@ const ReviewForm = ({ tutorId, recordingOptions = [], onSaved }) => {
 
     try {
       setLoading(true);
+
       const token = localStorage.getItem("token");
 
       const res = await axios.post(
@@ -24,7 +25,7 @@ const ReviewForm = ({ tutorId, recordingOptions = [], onSaved }) => {
           tutorId,
           rating,
           comment,
-          recordingId: recordingId || null
+          recordingId: recordingId || null,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -33,9 +34,9 @@ const ReviewForm = ({ tutorId, recordingOptions = [], onSaved }) => {
       setRating(5);
       setRecordingId("");
 
-      if (onSaved) onSaved(res.data);
+      onSaved && onSaved(res.data);
+
     } catch (err) {
-      console.error("Review submit error:", err);
       alert("Failed to submit review");
     } finally {
       setLoading(false);
@@ -43,32 +44,62 @@ const ReviewForm = ({ tutorId, recordingOptions = [], onSaved }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow mt-4">
-      <h4 className="font-semibold mb-2">Write a Review</h4>
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-6 rounded-2xl shadow-md border mt-4 font-jakarta"
+    >
+      <h4 className="font-bold text-gray-800 mb-3 text-lg">Write a Review</h4>
 
-      <div className="flex items-center gap-3 mb-2">
-        <label className="text-sm">Rating</label>
-        <select value={rating} onChange={(e) => setRating(Number(e.target.value))} className="border p-1 rounded">
-          {[5,4,3,2,1].map(r => <option key={r} value={r}>{r} ★</option>)}
+      <div className="mb-4">
+        <label className="text-sm font-medium text-gray-700">Rating</label>
+        <select
+          value={rating}
+          onChange={(e) => setRating(Number(e.target.value))}
+          className="border p-2 w-full rounded-xl mt-1 focus:ring-2 focus:ring-purple-300"
+        >
+          {[5, 4, 3, 2, 1].map((r) => (
+            <option key={r} value={r}>
+              {r} ★
+            </option>
+          ))}
         </select>
       </div>
 
-      <div className="mb-2">
-        <label className="text-sm">Comment</label>
-        <textarea value={comment} onChange={(e) => setComment(e.target.value)} className="w-full border p-2 rounded mt-1" rows={3} required/>
+      <div className="mb-4">
+        <label className="text-sm font-medium text-gray-700">Comment</label>
+        <textarea
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          rows={3}
+          className="w-full border p-3 rounded-xl mt-1 focus:ring-2 focus:ring-purple-300"
+        />
       </div>
 
       {recordingOptions.length > 0 && (
-        <div className="mb-2">
-          <label className="text-sm">Attach to recording (optional)</label>
-          <select value={recordingId} onChange={e => setRecordingId(e.target.value)} className="w-full border p-2 rounded mt-1">
+        <div className="mb-4">
+          <label className="text-sm font-medium text-gray-700">
+            Attach to Recording (optional)
+          </label>
+          <select
+            value={recordingId}
+            onChange={(e) => setRecordingId(e.target.value)}
+            className="w-full border p-2 rounded-xl mt-1 focus:ring-2 focus:ring-purple-300"
+          >
             <option value="">— None —</option>
-            {recordingOptions.map(r => <option key={r._id} value={r._id}>{r.originalFileName}</option>)}
+            {recordingOptions.map((r) => (
+              <option key={r._id} value={r._id}>
+                {r.originalFileName}
+              </option>
+            ))}
           </select>
         </div>
       )}
 
-      <button type="submit" disabled={loading} className="bg-blue-600 text-white px-4 py-2 rounded">
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-2 rounded-xl shadow hover:opacity-95"
+      >
         {loading ? "Submitting..." : "Submit Review"}
       </button>
     </form>

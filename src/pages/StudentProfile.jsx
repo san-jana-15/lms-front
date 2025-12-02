@@ -1,3 +1,4 @@
+// src/pages/Student/StudentProfile.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import StudentSidebar from "../components/StudentSidebar";
@@ -13,12 +14,10 @@ const StudentProfile = () => {
   const loadProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-
       const res = await axios.get(
         "https://lms-back-nh5h.onrender.com/api/auth/profile",
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
 
       setUser(res.data);
       setName(res.data.name);
@@ -44,7 +43,6 @@ const StudentProfile = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-
       alert("Profile updated!");
       loadProfile();
     } catch (err) {
@@ -53,85 +51,92 @@ const StudentProfile = () => {
     }
   };
 
-  if (!user) return <p>Loading...</p>;
+  if (!user)
+    return (
+      <p className="text-center mt-10 font-jakarta text-lg text-gray-600">
+        Loading...
+      </p>
+    );
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gradient-to-br from-purple-50 to-blue-50 font-jakarta">
       <StudentSidebar />
 
-      <div className="flex-1 p-8 overflow-y-auto">
-        <h1 className="text-3xl font-bold mb-6">My Profile</h1>
+      <div className="flex-1 p-10 overflow-y-auto">
+        <h1 className="text-4xl font-extrabold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
+          My Profile
+        </h1>
 
-        <div className="bg-white shadow rounded-xl p-6 max-w-lg">
+        <div className="bg-white shadow-xl rounded-3xl p-8 max-w-xl border border-gray-100">
 
           {/* NAME */}
-          <label className="block mb-4">
-            <span className="text-gray-700">Name</span>
+          <label className="block mb-5">
+            <span className="text-gray-700 font-medium">Full Name</span>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-3 rounded-xl mt-1 shadow-sm focus:ring-2 focus:ring-purple-300"
             />
           </label>
 
           {/* EMAIL */}
-          <label className="block mb-4">
-            <span className="text-gray-700">Email</span>
+          <label className="block mb-5">
+            <span className="text-gray-700 font-medium">Email</span>
             <input
               value={user.email}
               readOnly
-              className="w-full border p-2 bg-gray-200 rounded mt-1"
+              className="w-full border p-3 bg-gray-100 rounded-xl mt-1 shadow-sm cursor-not-allowed"
             />
           </label>
 
-          {/* CONTACT NUMBER */}
-          <label className="block mb-4">
-            <span className="text-gray-700">Contact Number</span>
+          {/* CONTACT */}
+          <label className="block mb-5">
+            <span className="text-gray-700 font-medium">Contact Number</span>
             <input
               value={contact}
               onChange={(e) => setContact(e.target.value)}
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-3 rounded-xl mt-1 shadow-sm focus:ring-2 focus:ring-purple-300"
             />
           </label>
 
           {/* GENDER */}
-          <label className="block mb-4">
-            <span className="text-gray-700">Gender</span>
+          <label className="block mb-5">
+            <span className="text-gray-700 font-medium">Gender</span>
             <select
               value={gender}
               onChange={(e) => setGender(e.target.value)}
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-3 rounded-xl mt-1 shadow-sm focus:ring-2 focus:ring-purple-300"
             >
-              <option value="">Select</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
+              <option value="">Select gender...</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
             </select>
           </label>
 
           {/* OCCUPATION */}
-          <label className="block mb-4">
-            <span className="text-gray-700">Occupation</span>
+          <label className="block mb-5">
+            <span className="text-gray-700 font-medium">Occupation</span>
             <select
               value={occupation}
               onChange={(e) => setOccupation(e.target.value)}
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-3 rounded-xl mt-1 shadow-sm focus:ring-2 focus:ring-purple-300"
             >
-              <option value="">Select</option>
-              <option value="Student">Student</option>
-              <option value="Fresher">Fresher</option>
-              <option value="Graduate">Graduate</option>
-              <option value="Working Professional">Working Professional</option>
+              <option value="">Select occupation...</option>
+              <option>Student</option>
+              <option>Fresher</option>
+              <option>Graduate</option>
+              <option>Working Professional</option>
             </select>
           </label>
 
+          {/* SAVE BUTTON */}
           <button
             onClick={saveProfile}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded mt-3"
+            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-xl text-lg font-semibold shadow hover:opacity-90"
           >
             Save Changes
           </button>
-
         </div>
       </div>
     </div>

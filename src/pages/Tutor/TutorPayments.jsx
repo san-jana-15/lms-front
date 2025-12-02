@@ -1,14 +1,12 @@
 // src/pages/TutorPayments.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import api from "../../axiosClient";
 
 const TutorPayments = () => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const API = "https://lms-back-nh5h.onrender.com";
-
 
   useEffect(() => {
     loadPayments();
@@ -21,7 +19,6 @@ const TutorPayments = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // If server returns tutor payments without population, consider populating in backend.
       setPayments(res.data || []);
     } catch (err) {
       console.error("Error loading payments:", err);
@@ -31,35 +28,52 @@ const TutorPayments = () => {
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-3xl font-bold mb-6">Payments</h2>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 font-jakarta p-6">
+      <h2 className="text-3xl font-extrabold text-purple-700 mb-6">
+        💰 Earnings & Payments
+      </h2>
 
       {loading ? (
-        <p>Loading...</p>
+        <p className="text-gray-500">Loading payments...</p>
       ) : payments.length === 0 ? (
-        <p className="text-gray-600">No payments yet.</p>
+        <p className="text-gray-600 bg-white shadow p-6 rounded-2xl border w-fit">
+          No payments recorded yet.
+        </p>
       ) : (
-        <div className="bg-white shadow p-6 rounded-xl">
-          <table className="w-full">
+        <div className="bg-white p-6 rounded-2xl shadow-xl border">
+          <table className="w-full table-auto">
             <thead>
-              <tr className="border-b text-gray-700 text-left">
-                <th className="py-3">Student</th>
-                <th>Type / Recording</th>
-                <th>Amount</th>
-                <th>Date</th>
+              <tr className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+                <th className="py-3 px-4 text-left rounded-l-xl">Student</th>
+                <th className="py-3 text-left">Type</th>
+                <th className="py-3 text-left">Amount</th>
+                <th className="py-3 text-left rounded-r-xl">Date</th>
               </tr>
             </thead>
 
             <tbody>
               {payments.map((p) => (
-                <tr key={p._id} className="border-b">
-                  <td className="py-3">{p.student?.name || p.email || p.student || "Student"}</td>
+                <tr
+                  key={p._id}
+                  className="border-b hover:bg-gray-50 transition"
+                >
+                  <td className="py-3 px-4 font-medium text-gray-800">
+                    {p.student?.name || "Student"}
+                  </td>
 
-                  <td>{p.recording ? p.recording.originalFileName : "Booking Payment"}</td>
+                  <td className="text-gray-700">
+                    {p.recording
+                      ? p.recording.originalFileName
+                      : "Booking Payment"}
+                  </td>
 
-                  <td className="font-semibold text-green-600">₹{p.amount}</td>
+                  <td className="font-semibold text-green-600">
+                    ₹{p.amount}
+                  </td>
 
-                  <td>{new Date(p.createdAt || p.date).toLocaleString()}</td>
+                  <td className="text-gray-500">
+                    {new Date(p.createdAt).toLocaleString()}
+                  </td>
                 </tr>
               ))}
             </tbody>

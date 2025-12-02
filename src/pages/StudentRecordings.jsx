@@ -1,3 +1,4 @@
+// src/pages/StudentRecordings.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import StudentSidebar from "../components/StudentSidebar";
@@ -8,7 +9,7 @@ const StudentRecordings = () => {
   const [recordings, setRecordings] = useState([]);
   const [paidIds, setPaidIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
-  const [selectedVideo, setSelectedVideo] = useState(null); // { url, id }
+  const [selectedVideo, setSelectedVideo] = useState(null);
 
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [reviewRecordingId, setReviewRecordingId] = useState(null);
@@ -16,7 +17,6 @@ const StudentRecordings = () => {
 
   const API = "https://lms-back-nh5h.onrender.com";
 
-  // Load purchased recordings + available recordings
   const loadRecordings = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -46,12 +46,8 @@ const StudentRecordings = () => {
     loadRecordings();
   }, []);
 
-  // SECURE Playback URL
   const handlePlay = async (rec) => {
-    if (!paidIds.has(rec._id)) {
-      alert("You must purchase this recording to watch it.");
-      return;
-    }
+    if (!paidIds.has(rec._id)) return alert("Please purchase this recording first.");
 
     try {
       const token = localStorage.getItem("token");
@@ -60,18 +56,12 @@ const StudentRecordings = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setSelectedVideo({
-        url: `${API}${res.data.url}`,
-        id: rec._id,
-      });
-
-    } catch (err) {
-      console.error("Playback URL error:", err);
-      alert("Unable to load video. Try again.");
+      setSelectedVideo({ url: `${API}${res.data.url}`, id: rec._id });
+    } catch {
+      alert("Video could not be loaded.");
     }
   };
 
-  // Show review modal after video ends
   const handleVideoEnded = (rec) => {
     const key = `reviewed_${rec._id}`;
     if (localStorage.getItem(key)) return;
@@ -81,44 +71,56 @@ const StudentRecordings = () => {
     setShowReviewModal(true);
   };
 
-  if (loading) return <p className="mt-10 text-center">Loading...</p>;
+  if (loading)
+    return (
+      <p className="text-center mt-10 font-jakarta text-gray-600 text-lg">
+        Loading...
+      </p>
+    );
 
-  const purchased = recordings.filter(r => paidIds.has(r._id));
-  const available = recordings.filter(r => !paidIds.has(r._id));
+  const purchased = recordings.filter((r) => paidIds.has(r._id));
+  const available = recordings.filter((r) => !paidIds.has(r._id));
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gradient-to-br from-purple-50 to-blue-50 font-jakarta">
       <StudentSidebar />
 
-      <div className="flex-1 p-8 overflow-y-auto">
-        <h1 className="text-3xl font-bold mb-6">My Recordings</h1>
+      <div className="flex-1 p-10 overflow-y-auto">
+        <h1 className="text-4xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+          My Recordings
+        </h1>
 
         {/* PURCHASED */}
-        <h2 className="text-2xl font-semibold mb-4 text-green-700">Purchased</h2>
+        <h2 className="text-2xl font-bold mb-4 text-green-700">Purchased</h2>
 
         {purchased.length === 0 ? (
-          <p className="text-gray-600 mb-10">You haven't purchased any recordings.</p>
+          <p className="text-gray-600 mb-10">
+            You haven't purchased any recordings yet.
+          </p>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
             {purchased.map((rec) => (
-              <div key={rec._id} className="bg-white shadow rounded-xl p-5">
+              <div
+                key={rec._id}
+                className="bg-white shadow-lg rounded-3xl p-6 border border-gray-100 hover:shadow-xl transition"
+              >
                 <video
                   src={`${API}${rec.filePath}`}
+                  className="w-full h-44 rounded-xl mb-4 object-cover cursor-pointer shadow"
                   onClick={() => handlePlay(rec)}
-                  className="w-full h-40 rounded-lg mb-3 cursor-pointer"
-                  controls={false}
                 />
 
-                <h3 className="text-lg font-semibold">{rec.originalFileName}</h3>
+                <h3 className="text-lg font-bold">{rec.originalFileName}</h3>
                 <p className="text-sm text-gray-500">{rec.description}</p>
-                <p className="text-sm mt-2">
+
+                <p className="mt-2 text-sm">
                   Tutor: <strong>{rec.tutor?.name}</strong>
                 </p>
 
-                <div className="mt-3 flex gap-2">
+                <div className="mt-4 flex gap-3">
                   <button
                     onClick={() => handlePlay(rec)}
-                    className="px-3 py-2 bg-blue-600 text-white rounded"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700"
                   >
                     Play
                   </button>
@@ -129,7 +131,7 @@ const StudentRecordings = () => {
                       setReviewTutorId(rec.tutor?._id);
                       setShowReviewModal(true);
                     }}
-                    className="px-3 py-2 border rounded"
+                    className="px-4 py-2 border rounded-xl shadow hover:bg-gray-50"
                   >
                     Rate Tutor
                   </button>
@@ -140,32 +142,35 @@ const StudentRecordings = () => {
         )}
 
         {/* AVAILABLE */}
-        <h2 className="text-2xl font-semibold mb-4 text-purple-700">Available to Buy</h2>
+        <h2 className="text-2xl font-bold mb-4 text-purple-700">Available to Buy</h2>
 
         {available.length === 0 ? (
           <p className="text-gray-600">No recordings available.</p>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {available.map((rec) => (
-              <div key={rec._id} className="bg-white shadow rounded-xl p-5">
-                <div className="relative w-full h-40 bg-black rounded-lg overflow-hidden mb-3" />
+              <div
+                key={rec._id}
+                className="bg-white shadow-lg rounded-3xl p-6 border border-gray-100 hover:shadow-xl transition"
+              >
+                <div className="w-full h-44 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl mb-4"></div>
 
-                <h3 className="text-lg font-semibold">{rec.originalFileName}</h3>
+                <h3 className="text-lg font-bold">{rec.originalFileName}</h3>
                 <p className="text-sm text-gray-500">{rec.description}</p>
-                <p className="text-sm mt-2">
+                <p className="mt-2 text-sm">
                   Tutor: <strong>{rec.tutor?.name}</strong>
                 </p>
 
                 <div className="flex items-center justify-between mt-4">
-                  <p className="text-lg font-bold text-green-600">₹{rec.price}</p>
+                  <p className="text-xl font-bold text-green-600">₹{rec.price}</p>
 
                   <PaymentButton
                     recordingId={rec._id}
                     amount={rec.price}
                     tutorId={rec.tutor?._id}
-                    onPaid={() => {
-                      setPaidIds((prev) => new Set([...prev, rec._id]));
-                    }}
+                    onPaid={() =>
+                      setPaidIds((prev) => new Set([...prev, rec._id]))
+                    }
                   />
                 </div>
               </div>
@@ -176,22 +181,22 @@ const StudentRecordings = () => {
 
       {/* VIDEO PLAYER MODAL */}
       {selectedVideo && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-4 max-w-3xl w-full relative">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-4 max-w-3xl w-full relative shadow-2xl">
             <button
-              className="absolute top-2 right-2 text-xl"
+              className="absolute top-3 right-3 text-2xl font-bold hover:text-red-500"
               onClick={() => setSelectedVideo(null)}
             >
-              ✖
+              ✕
             </button>
 
             <video
               controls
               autoPlay
               src={selectedVideo.url}
-              className="w-full rounded-lg"
+              className="w-full rounded-xl shadow"
               onEnded={() => {
-                const rec = recordings.find(r => r._id === selectedVideo.id);
+                const rec = recordings.find((r) => r._id === selectedVideo.id);
                 if (rec) handleVideoEnded(rec);
               }}
             />
@@ -206,9 +211,7 @@ const StudentRecordings = () => {
           tutorId={reviewTutorId}
           onClose={() => setShowReviewModal(false)}
           onSaved={() => {
-            if (reviewRecordingId) {
-              localStorage.setItem(`reviewed_${reviewRecordingId}`, "1");
-            }
+            localStorage.setItem(`reviewed_${reviewRecordingId}`, "1");
             setShowReviewModal(false);
           }}
         />

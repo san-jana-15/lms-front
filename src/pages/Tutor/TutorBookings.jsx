@@ -12,10 +12,6 @@ const TutorBookings = () => {
   const authHeader = { headers: { Authorization: `Bearer ${token}` } };
   const API = "https://lms-back-nh5h.onrender.com";
 
-
-  /* ===============================
-        LOAD TUTOR BOOKINGS
-  =============================== */
   const loadBookings = async () => {
     try {
       const res = await axios.get(`${API}/api/bookings/tutor`, authHeader);
@@ -31,57 +27,41 @@ const TutorBookings = () => {
     loadBookings();
   }, []);
 
-  /* ===============================
-        ACCEPT BOOKING
-  =============================== */
   const handleAccept = async (id) => {
     try {
       await axios.patch(`${API}/api/bookings/accept/${id}`, {}, authHeader);
       loadBookings();
-    } catch (err) {
-      console.error("Accept error:", err);
+    } catch {
       alert("Failed to accept booking");
     }
   };
 
-  /* ===============================
-        DECLINE BOOKING
-  =============================== */
   const handleDecline = async (id) => {
     try {
       await axios.patch(`${API}/api/bookings/decline/${id}`, {}, authHeader);
       loadBookings();
-    } catch (err) {
-      console.error("Decline error:", err);
+    } catch {
       alert("Failed to decline booking");
     }
   };
 
-  /* ===============================
-        OPEN/CLOSE RESCHEDULE MODAL
-  =============================== */
-  const openReschedule = (booking) => setSelectedBooking(booking);
-  const closeReschedule = () => {
-    setSelectedBooking(null);
-    loadBookings();
-  };
-
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-6">My Bookings</h1>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 font-jakarta p-8">
+      <h1 className="text-3xl font-extrabold text-purple-700 mb-6">
+        📅 My Bookings
+      </h1>
 
       {loading ? (
-        <p>Loading...</p>
+        <p className="text-gray-600">Loading...</p>
       ) : bookings.length === 0 ? (
-        <p>No bookings yet.</p>
+        <p className="text-gray-600">No bookings yet.</p>
       ) : (
         <div className="space-y-6">
           {bookings.map((b) => (
             <div
               key={b._id}
-              className="border p-5 rounded-xl shadow bg-white"
+              className="bg-white p-6 rounded-2xl shadow-xl border hover:shadow-2xl transition"
             >
-              {/* STUDENT INFO */}
               <p className="text-lg font-semibold">
                 Student:{" "}
                 <span className="text-blue-600">
@@ -93,25 +73,23 @@ const TutorBookings = () => {
                 Email: {b.studentId?.email || "N/A"}
               </p>
 
-              {/* DATE & TIME */}
-              <p className="mt-2">
+              <p className="mt-3">
                 <strong>Date:</strong> {b.date}
               </p>
               <p>
                 <strong>Time:</strong> {b.time}
               </p>
 
-              {/* STATUS */}
-              <p className="mt-2">
-                <strong>Status:</strong>{" "}
+              <p className="mt-3 font-medium">
+                Status:{" "}
                 <span
-                  className={
+                  className={`px-3 py-1 rounded-full text-sm ${
                     b.tutorStatus === "accepted"
-                      ? "text-green-600"
+                      ? "bg-green-100 text-green-700"
                       : b.tutorStatus === "declined"
-                        ? "text-red-600"
-                        : "text-yellow-600"
-                  }
+                      ? "bg-red-100 text-red-700"
+                      : "bg-yellow-100 text-yellow-700"
+                  }`}
                 >
                   {b.tutorStatus}
                 </span>
@@ -121,20 +99,19 @@ const TutorBookings = () => {
                 Booked On: {new Date(b.createdAt).toLocaleString()}
               </p>
 
-              {/* ACTION BUTTONS */}
-              <div className="flex gap-3 mt-4">
+              <div className="flex gap-4 mt-5">
                 {b.tutorStatus === "scheduled" && (
                   <>
                     <button
                       onClick={() => handleAccept(b._id)}
-                      className="bg-green-600 text-white px-4 py-2 rounded"
+                      className="px-5 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700"
                     >
                       Accept
                     </button>
 
                     <button
                       onClick={() => handleDecline(b._id)}
-                      className="bg-red-600 text-white px-4 py-2 rounded"
+                      className="px-5 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700"
                     >
                       Decline
                     </button>
@@ -142,8 +119,8 @@ const TutorBookings = () => {
                 )}
 
                 <button
-                  onClick={() => openReschedule(b)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded"
+                  onClick={() => setSelectedBooking(b)}
+                  className="px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700"
                 >
                   Reschedule
                 </button>
@@ -153,11 +130,13 @@ const TutorBookings = () => {
         </div>
       )}
 
-      {/* RESCHEDULE MODAL */}
       {selectedBooking && (
         <TutorRescheduleModal
           booking={selectedBooking}
-          onClose={closeReschedule}
+          onClose={() => {
+            setSelectedBooking(null);
+            loadBookings();
+          }}
         />
       )}
     </div>
