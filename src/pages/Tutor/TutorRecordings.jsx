@@ -15,24 +15,37 @@ const TutorRecordings = () => {
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const token = localStorage.getItem("token"); // <-- IMPORTANT
+
   useEffect(() => {
     fetchRecordings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // =======================
+  // FETCH RECORDINGS
+  // =======================
   const fetchRecordings = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${API}/api/recordings/tutor`);
+
+      const res = await axios.get(`${API}/api/recordings/tutor`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // <-- FIXED
+        },
+      });
+
       setRecordings(res.data || []);
     } catch (err) {
-      console.error(err);
+      console.error("Fetch recordings error:", err);
       setRecordings([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // =======================
+  // UPLOAD RECORDING
+  // =======================
   const upload = async () => {
     if (!file) return alert("Choose a file first");
     if (!subject) return alert("Subject is required");
@@ -40,15 +53,17 @@ const TutorRecordings = () => {
 
     try {
       setUploading(true);
+
       const fd = new FormData();
       fd.append("recording", file);
       fd.append("description", description);
       fd.append("subject", subject);
       fd.append("price", price);
 
-      // Do not set content-type manually
       await axios.post(`${API}/api/recordings/upload`, fd, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          Authorization: `Bearer ${token}`, // <-- FIXED
+        },
       });
 
       alert("Uploaded successfully");
@@ -56,23 +71,32 @@ const TutorRecordings = () => {
       setDescription("");
       setSubject("");
       setPrice("");
+
       fetchRecordings();
     } catch (err) {
-      console.error(err);
+      console.error("Upload failed:", err);
       alert("Upload failed");
     } finally {
       setUploading(false);
     }
   };
 
+  // =======================
+  // DELETE RECORDING
+  // =======================
   const deleteRecording = async (id) => {
     if (!window.confirm("Delete this recording?")) return;
 
     try {
-      await axios.delete(`${API}/api/recordings/${id}`);
+      await axios.delete(`${API}/api/recordings/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // <-- FIXED
+        },
+      });
+
       fetchRecordings();
     } catch (err) {
-      console.error(err);
+      console.error("Delete error:", err);
       alert("Failed to delete");
     }
   };
@@ -80,13 +104,19 @@ const TutorRecordings = () => {
   return (
     <div className="p-6 min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 font-jakarta">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl font-extrabold mb-6 text-purple-700">🎥 Lesson Recordings</h2>
+        <h2 className="text-4xl font-extrabold mb-6 text-purple-700">
+          🎥 Lesson Recordings
+        </h2>
 
         {/* Upload Section */}
         <div className="bg-white p-6 mb-8 rounded-2xl shadow-xl border">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold flex items-center gap-2"><FiUpload className="text-purple-600" /> Upload New Recording</h3>
-            <div className="text-sm text-gray-500">{loading ? "Loading..." : `${recordings.length} recordings`}</div>
+            <h3 className="text-xl font-semibold flex items-center gap-2">
+              <FiUpload className="text-purple-600" /> Upload New Recording
+            </h3>
+            <div className="text-sm text-gray-500">
+              {loading ? "Loading..." : `${recordings.length} recordings`}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -136,7 +166,10 @@ const TutorRecordings = () => {
         {/* Recordings Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {recordings.map((r) => (
-            <div key={r._id} className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition border">
+            <div
+              key={r._id}
+              className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition border"
+            >
               <div className="relative">
                 <video
                   src={`${API}${r.filePath}`}
@@ -153,16 +186,24 @@ const TutorRecordings = () => {
 
               <div className="p-4">
                 <h4 className="text-lg font-semibold">{r.originalFileName}</h4>
-                <p className="text-gray-600 text-sm">{r.description || "No description"}</p>
+                <p className="text-gray-600 text-sm">
+                  {r.description || "No description"}
+                </p>
 
                 <div className="flex items-center justify-between mt-3">
                   <div>
-                    <p className="text-sm text-gray-700"><strong>Subject:</strong> {r.subject || "—"}</p>
-                    <p className="text-sm text-green-700 font-bold">₹{r.price || 0}</p>
+                    <p className="text-sm text-gray-700">
+                      <strong>Subject:</strong> {r.subject || "—"}
+                    </p>
+                    <p className="text-sm text-green-700 font-bold">
+                      ₹{r.price || 0}
+                    </p>
                   </div>
 
                   <div className="flex flex-col items-end gap-2">
-                    <div className="text-xs text-gray-500">{new Date(r.createdAt).toLocaleString()}</div>
+                    <div className="text-xs text-gray-500">
+                      {new Date(r.createdAt).toLocaleString()}
+                    </div>
 
                     <button
                       onClick={() => deleteRecording(r._id)}
@@ -188,7 +229,12 @@ const TutorRecordings = () => {
                 ✕
               </button>
 
-              <video controls autoPlay src={selectedVideo} className="w-full rounded-xl" />
+              <video
+                controls
+                autoPlay
+                src={selectedVideo}
+                className="w-full rounded-xl"
+              />
             </div>
           </div>
         )}
